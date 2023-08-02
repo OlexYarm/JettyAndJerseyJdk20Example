@@ -28,8 +28,12 @@ public class MainApp {
         handler.setContextPath("/");
         handler.addServlet(new ServletHolder(new ServletContainer(resourceConfig)), "/api/v1/*");
 
+        DefaultHandler defaultHandler = new DefaultHandler();
+        defaultHandler.setShowContexts(false);
+
         HandlerList handlerLists = new HandlerList();
-        handlerLists.setHandlers(new Handler[]{handler, new DefaultHandler()});
+
+        handlerLists.setHandlers(new Handler[]{handler, defaultHandler});
 
         Server server = new Server(8080);
         server.setHandler(handlerLists);
