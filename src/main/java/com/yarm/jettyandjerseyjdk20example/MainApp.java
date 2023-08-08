@@ -40,7 +40,7 @@ public class MainApp {
 
         // https://eclipse.dev/jetty/documentation/jetty-11/programming-guide/index.html#pg-server
         // Use a file name with the pattern 'yyyy_MM_dd' so rolled over files retain their date.
-        RequestLogWriter logWriter = new RequestLogWriter("../logs/yyyy_MM_dd.jetty.request.log");
+        RequestLogWriter logWriter = new RequestLogWriter("../../Jetty.Requests.yyyy_MM_dd.log");
         // Retain rolled over files for 2 weeks.
         logWriter.setRetainDays(14);
         // Log times are in the current time zone.
