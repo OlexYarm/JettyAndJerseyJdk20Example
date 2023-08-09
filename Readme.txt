@@ -163,10 +163,10 @@ F:\ProjectsJava\JettyAndJerseyJdk20Example\target>
 
 6) Notes
 
-6.1) The value for request log file location is hardcoded in "MainApp.java" class similar to provided in Eclipse Jetty documentation
-https://eclipse.dev/jetty/documentation/jetty-11/programming-guide/index.html#pg-server-http-request-logging
-The directory in the location should match the value for log application file in logback.xml file.
-Another case Jetty server may fail to start with confusing error "java.io.IOException: Cannot write log directory ..."
+6.1) The Eclipse Jetty 11 documentation contains sample code for writing messages about incoming requests to log file (https://eclipse.dev/jetty/documentation/jetty-11/programming-guide/index.html#pg-server-http-request-logging).
+The path and name of log file can be provided in RequestLogWriter constructor or by setFilename setter.
+If log path and name is not provided then all log messages will go on console.
+if log path contains directory what does not exist the Jetty server will fail to start with confusing error "java.io.IOException: Cannot write log directory ..."
 
 2023-07-29T19:15:33.823-0400 LEVEL=INFO, MSG=#### Starting Jetty server., com.yarm.jettyandjerseyjdk20example.MainApp:main
 2023-07-29T19:15:33.833-0400 LEVEL=INFO, MSG=jetty-11.0.15; built: 2023-04-11T18:37:53.775Z; git: 5bc5e562c8d05c5862505aebe5cf83a61bdbcb96; jvm 20.0.1+9-29, org.eclipse.jetty.server.Server:doStart
@@ -174,11 +174,22 @@ Another case Jetty server may fail to start with confusing error "java.io.IOExce
 2023-07-29T19:15:34.327-0400 LEVEL=INFO, MSG=Stopped o.e.j.s.ServletContextHandler@26d820eb{/,null,STOPPED}, org.eclipse.jetty.server.handler.ContextHandler:doStop
 2023-07-29T19:15:34.331-0400 LEVEL=ERROR, MSG=#### Cannot start Jetty server. Exception=java.io.IOException: Cannot write log directory F:\ProjectsJava\JettyAndJerseyJdk20Example\log, com.yarm.jettyadjerseyjdk20example.MainApp:main
 
+The incorrect error message comes from public class RolloverFileOutputStream in package org.eclipse.jetty.util:
+...
+        // Check directory
+        File file = new File(_filename);
+        _filename=file.getCanonicalPath();
+        file=new File(_filename);
+        File dir= new File(file.getParent());
+        if (!dir.isDirectory() || !dir.canWrite())
+            throw new IOException("Cannot write log directory "+dir);
+...
+
+The sample code in Jetty 11 documentation points on directory "/var/log/yyyy_MM_dd.jetty.request.log" what usually exists in Unix OSes.
+
 6.2) I could stop example application with Ctrl+C as explained above.
 The org.eclipse.jetty.server.handler.ShutdownHandler did not work.
 Stopping Jetty server from remote as explained in Eclipse Jetty documentation (https://eclipse.dev/jetty/documentation/jetty-11/operations-guide/index.html#og-start-stop-remote) failed.
 
-6.3) The org.eclipse.jetty.server.handler.DefaultHandler 
-
-
-
+6.3) The org.eclipse.jetty.server.handler.DefaultHandler ignores setting setShowContexts(false) and always respond with 404 error context.
+It is security problem - it exposes underlying framework: "Powered by Jetty:// 11.0.15".
