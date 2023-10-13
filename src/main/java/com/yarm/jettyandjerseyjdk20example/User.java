@@ -45,4 +45,9 @@ public class User {
         this.lastName = lastName;
     }
 
+    @Override
+    public String toString() {
+
+        return "{FirstName=\"" + firstName + "\", LastName=\"" + lastName + "\"}";
+    }
 }
